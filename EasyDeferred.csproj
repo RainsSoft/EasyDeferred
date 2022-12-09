@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{477E97FD-6F8A-4978-B2A3-B5BA3E874658}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EasyDeferred</RootNamespace>
+    <AssemblyName>Promise.Net20</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1701;1702</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EasyDeferred.Collections\Deque.cs" />
+    <Compile Include="EasyDeferred.Collections\GenericDeque.cs" />
+    <Compile Include="EasyDeferred.Collections\PriorityQueue.cs" />
+    <Compile Include="EasyDeferred.Collections\TCollection.cs" />
+    <Compile Include="EasyDeferred.Core\AbstractFactory.cs" />
+    <Compile Include="EasyDeferred.Core\DisposableObject.cs" />
+    <Compile Include="EasyDeferred.Core\Log.cs" />
+    <Compile Include="EasyDeferred.Core\LogManager.cs" />
+    <Compile Include="EasyDeferred.Coroutine\CoroutineMgr.cs" />
+    <Compile Include="EasyDeferred.Coroutine\CoroutineRunner.cs" />
+    <Compile Include="EasyDeferred.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\BlockingCollection.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ConcurrentBag.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ConcurrentQueue.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ConcurrentStack.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\IProducerConsumerCollection.cs" />
+    <Compile Include="EasyDeferred.Threading\ThreadLocal.cs" />
+    <Compile Include="EasyDeferred.Synchronize\AsyncResult.cs" />
+    <Compile Include="EasyDeferred.Synchronize\InvokeCompletedEventArgs.cs" />
+    <Compile Include="EasyDeferred.Synchronize\PostCompletedEventArgs.cs" />
+    <Compile Include="EasyDeferred.Synchronize\SyncConsoleContext.cs" />
+    <Compile Include="EasyDeferred.Synchronize\SyncEasyInvoke.cs" />
+    <Compile Include="EasyDeferred.Synchronize\SyncContextInvoke.AsyncResult.cs" />
+    <Compile Include="EasyDeferred.Synchronize\SyncContextInvoke.cs" />
+    <Compile Include="EasyDeferred.Synchronize\SyncDelayTimesScheduler.cs" />
+    <Compile Include="EasyDeferred.Threading\AsyncOperation.cs" />
+    <Compile Include="EasyDeferred.Threading\AtomicBoolean.cs" />
+    <Compile Include="EasyDeferred.ThreadPooling\EasyThreadPool.cs" />
+    <Compile Include="EasyDeferred.Synchronize\Dispatcher.cs" />
+    <Compile Include="EasyDeferred.ThreadPooling\FairThreadPool.cs" />
+    <Compile Include="EasyDeferred.Threading\ManualResetEventSlim.cs" />
+    <Compile Include="EasyDeferred.Threading\SpinWait.cs" />
+    <Compile Include="EasyDeferred.ThreadPooling\SimpleThreadPool.cs" />
+    <Compile Include="EasyDeferred.Threading\ThreadTimer.cs" />
+    <Compile Include="EasySynchronizationContextInvokeBase.cs" />
+    <Compile Include="InterceptableEnumerator.cs" />
+    <Compile Include="PromiseCoroutine.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ConcurrentDictionary.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ExtensionAttribute.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\HashPrimeNumbers.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\HashSet.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\ISet.cs" />
+    <Compile Include="EasyDeferred.RSG.Net35Ex\RSG.Linq.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\EnumerableExt.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\Exceptions\PromiseException.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\Exceptions\PromiseStateException.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\Promise.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\PromiseHelpers.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\PromiseTimer.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\Promise_NonGeneric.cs" />
+    <Compile Include="EasyDeferred.RSG.Promise\Tuple.cs" />
+    <Compile Include="EasyDeferred.Core\Singleton.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
