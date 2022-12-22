@@ -9,7 +9,7 @@ namespace DispatcherTest
     class Program
     {
         static void Main(string[] args) {
-            Main2(args);
+            //Main2(args);
             Console.WriteLine("thread id:" + Thread.CurrentThread.ManagedThreadId);         
             var dp = Dispatcher.CurrentDispatcher;
             if (dp != null) {

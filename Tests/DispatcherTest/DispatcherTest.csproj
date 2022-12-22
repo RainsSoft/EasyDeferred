@@ -41,7 +41,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Promise\Promise.Net20\EasyDeferred.csproj">
+    <ProjectReference Include="..\..\EasyDeferred.csproj">
       <Project>{477e97fd-6f8a-4978-b2a3-b5ba3e874658}</Project>
       <Name>EasyDeferred</Name>
     </ProjectReference>
