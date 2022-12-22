@@ -10,24 +10,24 @@ namespace EasyDeferredCoroutineTest
         private static readonly Event TestEvent = new Event();
 
         public static void Test() {
-            var seconds = CoroutineHandler.Start(WaitSeconds(), "Awesome Waiting Coroutine");
+            var seconds = CoroutineHandler.Start(WaitSeconds(), "thread id:"+System.Threading.Thread.CurrentThread.ManagedThreadId+"Awesome Waiting Coroutine");
             CoroutineHandler.Start(PrintEvery10Seconds(seconds));
 
             CoroutineHandler.Start(EmptyCoroutine());
 
             CoroutineHandler.InvokeLater(new Wait(5), () => {
-                Console.WriteLine("Raising test event");
+                Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "Raising test event");
                 CoroutineHandler.RaiseEvent(TestEvent);
             });
-            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("Example event received"));
+            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "Example event received"));
 
-            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("I am invoked after 'Example event received'"), priority: -5);
-            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("I am invoked before 'Example event received'"), priority: 2);
+            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "I am invoked after 'Example event received'"), priority: -5);
+            CoroutineHandler.InvokeLater(new Wait(TestEvent), () => Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "I am invoked before 'Example event received'"), priority: 2);
 
             var lastTime = DateTime.Now;
             while (true) {
                 if (CoroutineHandler.EventCount > 0)
-                    Console.WriteLine("EventCount:"+CoroutineHandler.EventCount);
+                    Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "EventCount:" +CoroutineHandler.EventCount);
                 var currTime = DateTime.Now;
                 CoroutineHandler.Tick(currTime - lastTime);
                 lastTime = currTime;
@@ -36,27 +36,27 @@ namespace EasyDeferredCoroutineTest
         }
 
         private static IEnumerator<Wait> WaitSeconds() {
-            Console.WriteLine("First thing " + DateTime.Now);
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "First thing " + DateTime.Now);
             yield return new Wait(1);
-            Console.WriteLine("After 1 second " + DateTime.Now);
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "After 1 second " + DateTime.Now);
             yield return new Wait(9);
-            Console.WriteLine("After 10 seconds " + DateTime.Now);
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "After 10 seconds " + DateTime.Now);
             CoroutineHandler.Start(NestedCoroutine());
             yield return new Wait(5);
-            Console.WriteLine("After 5 more seconds " + DateTime.Now);
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "After 5 more seconds " + DateTime.Now);
             yield return new Wait(10);
-            Console.WriteLine("After 10 more seconds " + DateTime.Now);
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "After 10 more seconds " + DateTime.Now);
 
             yield return new Wait(20);
-            Console.WriteLine("First coroutine done");
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "First coroutine done");
         }
 
         private static IEnumerator<Wait> PrintEvery10Seconds(ActiveCoroutine first) {
             while (true) {
                 yield return new Wait(10);
-                Console.WriteLine("The time is " + DateTime.Now);
+                Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "The time is " + DateTime.Now);
                 if (first.IsFinished) {
-                    Console.WriteLine("By the way, the first coroutine has finished!");
+                    Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "By the way, the first coroutine has finished!");
                     Console.WriteLine($"{first.Name} data: {first.MoveNextCount} moves, " +
                                       $"{first.TotalMoveNextTime.TotalMilliseconds} total time, " +
                                       $"{first.LastMoveNextTime.TotalMilliseconds} last time");
@@ -70,9 +70,9 @@ namespace EasyDeferredCoroutineTest
         }
 
         private static IEnumerable<Wait> NestedCoroutine() {
-            Console.WriteLine("I'm a coroutine that was started from another coroutine!");
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "I'm a coroutine that was started from another coroutine!");
             yield return new Wait(5);
-            Console.WriteLine("It's been 5 seconds since a nested coroutine was started, yay!");
+            Console.WriteLine("thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId + "It's been 5 seconds since a nested coroutine was started, yay!");
         }
         class Assert
         {
