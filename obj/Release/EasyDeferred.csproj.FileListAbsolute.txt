@@ -1,6 +1,0 @@
-G:\GitHub\EasyDeferred\bin\Release\EasyDeferred.dll
-G:\GitHub\EasyDeferred\bin\Release\EasyDeferred.pdb
-G:\GitHub\EasyDeferred\obj\Release\EasyDeferred.csproj.AssemblyReference.cache
-G:\GitHub\EasyDeferred\obj\Release\EasyDeferred.csproj.CoreCompileInputs.cache
-G:\GitHub\EasyDeferred\obj\Release\EasyDeferred.dll
-G:\GitHub\EasyDeferred\obj\Release\EasyDeferred.pdb
