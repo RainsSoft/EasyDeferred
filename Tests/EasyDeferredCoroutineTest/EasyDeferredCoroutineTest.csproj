@@ -43,13 +43,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Promise\Promise.Net20\EasyDeferred.csproj">
-      <Project>{477e97fd-6f8a-4978-b2a3-b5ba3e874658}</Project>
-      <Name>EasyDeferred</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Promise\Promise.Net20\Nito.Async\Nito.Async.csproj">
       <Project>{708763ed-7801-4f2c-b103-4febd771769a}</Project>
       <Name>Nito.Async</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EasyDeferred.csproj">
+      <Project>{477e97fd-6f8a-4978-b2a3-b5ba3e874658}</Project>
+      <Name>EasyDeferred</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
