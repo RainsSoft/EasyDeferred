@@ -12,15 +12,15 @@ namespace NitoAsyncTest
     class Program
     {
         static void Main(string[] args) {
-            Console.ReadLine();
-           Main2();
+           // Console.ReadLine();
+           //Main2();
       
             //
             Nito.Async.ActionThread at = new Nito.Async.ActionThread();
             at.Start();
             at.DoSynchronously(() => {
                 System.Threading.Thread.Sleep(1000);
-                Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
+                Console.WriteLine("thread id2:"+System.Threading.Thread.CurrentThread.ManagedThreadId);
             });
             using (ActionDispatcher actionDispatcher = new ActionDispatcher()) {
                 actionDispatcher.QueueExit();
@@ -43,7 +43,7 @@ namespace NitoAsyncTest
                 ad.QueueAction(FirstAction);
                 ad.Run();
             }
-            Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("thread id1:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
 
         #region
@@ -61,7 +61,7 @@ namespace NitoAsyncTest
 
         // This is the BackgroundWorker's work that it has to do
         static void BackgroundWorkerWork(object sender, DoWorkEventArgs e) {
-            Console.WriteLine("BackgroundWorker thread ID is " + Thread.CurrentThread.ManagedThreadId +
+            Console.WriteLine("1BackgroundWorker thread ID is " + Thread.CurrentThread.ManagedThreadId +
                 " and is " + (Thread.CurrentThread.IsThreadPoolThread ? "" : "not ") + "a threadpool thread");
 
             // Sleep is very important work; don't let anyone tell you otherwise
@@ -73,7 +73,7 @@ namespace NitoAsyncTest
         static void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
             for (int i = 0; i < 10; i++) {
                 System.Threading.Thread.Sleep(1);
-                Console.WriteLine("BGW event thread ID is " + Thread.CurrentThread.ManagedThreadId +
+                Console.WriteLine("2BGW event thread ID is " + Thread.CurrentThread.ManagedThreadId +
                     " and is " + (Thread.CurrentThread.IsThreadPoolThread ? "" : "not ") + "a threadpool thread");
             }
             // When the BGW is done, signal our ActionThread to exit
@@ -114,7 +114,7 @@ namespace NitoAsyncTest
                                 actionDispatcher.QueueExit();
                             }
                         };
-                        //timer.Start();
+                        timer.Restart();
                     //}
                 };
             actionDispatcher.QueueAction(ta);
