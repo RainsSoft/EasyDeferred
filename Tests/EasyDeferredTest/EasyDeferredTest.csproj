@@ -13,7 +13,7 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -41,11 +41,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestAsyn.cs" />
     <Compile Include="TestFlow.cs" />
+    <Compile Include="TestFSMSharp.cs" />
+    <Compile Include="TestStateMachineBuilder.cs" />
     <Compile Include="TestSync.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Promise\Promise.Net20\EasyDeferred.csproj">
-      <Project>{477e97fd-6f8a-4978-b2a3-b5ba3e874658}</Project>
+    <ProjectReference Include="..\..\EasyDeferred.csproj">
+      <Project>{26dc0a31-3146-45b8-83dc-5bf6e5247189}</Project>
       <Name>EasyDeferred</Name>
     </ProjectReference>
   </ItemGroup>

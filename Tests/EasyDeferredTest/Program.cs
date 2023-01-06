@@ -14,9 +14,12 @@ namespace EasyDeferredTest
 
             //TestSync.doTest();
 
-            TestFlow.testFlow1();
+            //TestFlow.testFlow1();
 
             Console.ReadLine();
+            TestStateMachineBuilder.Test2();
+            //TestFSMSharp1.Test();
+            TestFSMSharp2.Test();
         }
 
 
