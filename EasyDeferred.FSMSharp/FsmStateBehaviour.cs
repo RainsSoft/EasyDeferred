@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
-namespace FSMSharp
+using EasyDeferred.RSG;
+namespace EasyDeferred.FSMSharp
 {
     /// <summary>
     /// Defines the behaviour of a state of a finit state machine
@@ -10,18 +10,24 @@ namespace FSMSharp
     public sealed class FsmStateBehaviour<T>
     {
         private List<Action<FsmStateData<T>>> m_ProcessCallbacks = new List<Action<FsmStateData<T>>>();
-        private List<Action> m_EnterCallbacks = new List<Action>();
-        private List<Action> m_LeaveCallbacks = new List<Action>();
+        //private List<Action> m_EnterCallbacks = new List<Action>();
+        private List<Action<T>> m_EnterCallbacks = new List<Action<T>>();
+        //private List<Action> m_LeaveCallbacks = new List<Action>();
+        private List<Action<T>> m_LeaveCallbacks = new List<Action<T>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FsmStateBehaviour{T}"/> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        internal FsmStateBehaviour(T state)
+        internal FsmStateBehaviour(T state,string name)
         {
             State = state;
+            this.Name = name;
         }
-
+        /// <summary>
+        ///友好名 
+        /// </summary>
+        public string Name { get; private set; }
         /// <summary>
         /// Gets the state associated with this behaviour
         /// </summary>
@@ -29,9 +35,17 @@ namespace FSMSharp
 
         /// <summary>
         /// Gets the time duration of the state (if any)
+        /// 控制时间进度,当进入状态时间>=Duration 时可切换State
         /// </summary>
         public float? Duration { get; private set; }
-
+        /// <summary>
+        /// 忽略时间进度，使用自己的进度控制,当<see cref="CustomizeProgress"/> >=1f时可切换State
+        /// </summary>
+        public bool IgnoreDurationAndEnableCustomProgress { get;private set; }
+        /// <summary>
+        /// 自定义进度，值范围(0~1),IgnoreDuration==true时起效，当 CustomizeProgress>=1f时可切换State
+        /// </summary>
+        public float CustomizeProgress { get;  set; }
         /// <summary>
         /// Gets the function which will be used to select the next state when this expires or Next() gets called.
         /// </summary>
@@ -40,8 +54,9 @@ namespace FSMSharp
         /// <summary>
         /// Sets a callback which will be called when the FSM enters in this state
         /// </summary>
-        public FsmStateBehaviour<T> OnEnter(Action callback)
+        public FsmStateBehaviour<T> OnEnter(Action<T> callback)
         {
+            CustomizeProgress = 0f;
             m_EnterCallbacks.Add(callback);
             return this;
         }
@@ -49,7 +64,7 @@ namespace FSMSharp
         /// <summary>
         /// Sets a callback which will be called when the FSM leaves this state
         /// </summary>
-        public FsmStateBehaviour<T> OnLeave(Action callback)
+        public FsmStateBehaviour<T> OnLeave(Action<T> callback)
         {
             m_LeaveCallbacks.Add(callback);
             return this;
@@ -66,34 +81,57 @@ namespace FSMSharp
 
         /// <summary>
         /// Sets the state to automatically expire after the given time (in seconds)
+        /// <paramref name="duration">时间进度总值</paramref>
+        /// <paramref name="ignoreDuration">如果值为true,则使用CustomizeProgress值控制跳转State</paramref>
         /// </summary>
-        public FsmStateBehaviour<T> Expires(float duration)
+        public FsmStateBehaviour<T> Expires(float duration,bool ignoreDurationAndEnableCustomProgress = false)
         {
-            Duration = duration;
+            this.Duration = duration;
+            this.IgnoreDurationAndEnableCustomProgress = ignoreDurationAndEnableCustomProgress;
             return this;
         }
 
         /// <summary>
         /// Sets the state to which the FSM goes when the duration of this expires, or when Next() gets called on the FSM
+        /// 指定下一个state(非立即进入),当进度>=1时，则自动进入到指定的State
         /// </summary>
         /// <param name="state">The state.</param>
         public FsmStateBehaviour<T> GoesTo(T state)
-        {
+        {            
             NextStateSelector = () => state;
             return this;
         }
 
         /// <summary>
         /// Sets a function which selects the state to which the FSM goes when the duration of this expires, or when Next() gets called on the FSM
+        /// 指定下一个state(非立即进入),当进度>=1时，则自动进入到指定的State
         /// </summary>
         /// <param name="stateSelector">The state selector function.</param>
         public FsmStateBehaviour<T> GoesTo(Func<T> stateSelector)
-        {
+        {            
             NextStateSelector = stateSelector;
             return this;
         }
-
-
+        /// <summary>
+        /// 立即跳转到State
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public FsmStateBehaviour<T> GoToStateImmediately(T state) {
+            this.CustomizeProgress = 1f;
+            this.IgnoreDurationAndEnableCustomProgress = true;
+            return GoesTo(state);
+        }
+        /// <summary>
+        /// 立即跳转到State
+        /// </summary>
+        /// <param name="stateSelector"></param>
+        /// <returns></returns>
+        public FsmStateBehaviour<T> GoToStateImmediately(Func<T> stateSelector) {
+            this.CustomizeProgress = 1f;
+            this.IgnoreDurationAndEnableCustomProgress = true;
+            return GoesTo(stateSelector);
+        }
         /// <summary>
         /// Calls the process callback
         /// </summary>
@@ -108,8 +146,16 @@ namespace FSMSharp
         /// </summary>
         internal void TriggerEnter()
         {
+            //var data = new FsmStateData<T>() {
+            //    Machine = this,
+            //    Behaviour = m_CurrentStateBehaviour,
+            //    State = m_CurrentState,
+            //    StateTime = stateTime,
+            //    AbsoluteTime = totalTime,
+            //    StateProgress = stateProgress
+            //};
             for (int i = 0, len = m_EnterCallbacks.Count; i < len; i++)
-                m_EnterCallbacks[i]();
+                m_EnterCallbacks[i](this.State);
         }
 
         /// <summary>
@@ -117,8 +163,16 @@ namespace FSMSharp
         /// </summary>
         internal void TriggerLeave()
         {
+            //var data = new FsmStateData<T>() {
+            //    Machine = this,
+            //    Behaviour = m_CurrentStateBehaviour,
+            //    State = m_CurrentState,
+            //    StateTime = stateTime,
+            //    AbsoluteTime = totalTime,
+            //    StateProgress = stateProgress
+            //};
             for (int i = 0, len = m_LeaveCallbacks.Count; i < len; i++)
-                m_LeaveCallbacks[i]();
+                m_LeaveCallbacks[i](this.State);
         }
     }
 }

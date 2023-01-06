@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FSMSharp
+namespace EasyDeferred.FSMSharp
 {
     public struct FsmSnapshot<T>
     {

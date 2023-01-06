@@ -1,4 +1,4 @@
-﻿namespace FSMSharp
+﻿namespace EasyDeferred.FSMSharp
 {
     /// <summary>
     /// Extension methods to easily use the FSM as a queueing of consecutive states.

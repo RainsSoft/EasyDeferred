@@ -1,4 +1,4 @@
-﻿namespace FSMSharp
+﻿namespace EasyDeferred.FSMSharp
 {
     /// <summary>
     /// Data regarding the current running state. Used as an argument to callbacks.
