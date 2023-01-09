@@ -256,10 +256,25 @@ namespace EasyDeferredTest
                 .Calls(d => {
                     Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f);
                     System.Diagnostics.Debug.Assert(d.State == s4, "传入对象不一致");
+                })
+                .SetEvent("触发事件s4",(arg)=> {
+                    Console.WriteLine("...触发事件s4");
                 });
 
             // Very important! set the starting state
             fsm.CurrentState = s1;
+            //
+            Thread t = new Thread(new ThreadStart(() => {
+                while (true) {
+                    var cr = Console.ReadKey(true);
+                    if (cr != null && cr.Key == ConsoleKey.T) {
+                        fsm.TriggerEvent("触发事件s4");
+                    }
+                }
+            }));           
+            t.Priority = ThreadPriority.Normal;
+            t.IsBackground = true;
+            t.Start();
         }
 
         public void Run() {
@@ -275,6 +290,7 @@ namespace EasyDeferredTest
             while (true) {
                 // 
                 fsm.Process((float)(DateTime.Now - baseTime).TotalSeconds);
+               
                 System.Threading.Thread.Sleep(1000);
             }
         }

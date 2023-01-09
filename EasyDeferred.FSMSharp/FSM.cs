@@ -249,6 +249,29 @@ namespace EasyDeferred.FSMSharp
             return v;
             //return this.m_StateBehaviours[state];
         }
+
+        #region Trigger Event
+        /// <summary>
+        /// Triggered when and event occurs. Executes the event's action if the 
+        /// current state is at the top of the stack, otherwise triggers it on 
+        /// the next state down.
+        /// </summary>
+        /// <param name="name">Name of the event to trigger</param>
+        public void TriggerEvent(string name) {
+            TriggerEvent(name, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Triggered when and event occurs. Executes the event's action if the 
+        /// current state is at the top of the stack, otherwise triggers it on 
+        /// the next state down.
+        /// </summary>
+        /// <param name="name">Name of the event to trigger</param>
+        /// <param name="eventArgs">Arguments to send to the event</param>
+        public void TriggerEvent(string name, EventArgs eventArgs) {
+            this.m_CurrentStateBehaviour?.TriggerEvent(name, eventArgs);           
+        }
+        #endregion
     }
 
 

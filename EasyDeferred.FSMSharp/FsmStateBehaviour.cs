@@ -174,5 +174,70 @@ namespace EasyDeferred.FSMSharp
             for (int i = 0, len = m_LeaveCallbacks.Count; i < len; i++)
                 m_LeaveCallbacks[i](this.State);
         }
+
+        #region Trigger Events
+
+        /// <summary>
+        /// Dictionary of all actions associated with this state.
+        /// </summary>
+        private readonly IDictionary<string, Action<EventArgs>> events = new Dictionary<string, Action<EventArgs>>();
+        /// <summary>
+        /// Sets an action to be associated with an identifier that can later be used
+        /// to trigger it.
+        /// Convenience method that uses default event args intended for events that 
+        /// don't need any arguments.
+        /// </summary>
+        public void SetEvent(string identifier, Action<EventArgs> eventTriggeredAction) {
+            SetEvent<EventArgs>(identifier, eventTriggeredAction);
+        }
+
+        /// <summary>
+        /// Sets an action to be associated with an identifier that can later be used
+        /// to trigger it.
+        /// </summary>
+        public void SetEvent<TEvent>(string identifier, Action<TEvent> eventTriggeredAction)
+            where TEvent : EventArgs {
+            events.Add(identifier, args => eventTriggeredAction(CheckEventArgs<TEvent>(identifier, args)));
+        }
+
+        /// <summary>
+        /// Cast the specified EventArgs to a specified type, throwing a descriptive exception if this fails.
+        /// </summary>
+        private static TEvent CheckEventArgs<TEvent>(string identifier, EventArgs args)
+            where TEvent : EventArgs {
+            try {
+                return (TEvent)args;
+            }
+            catch(InvalidCastException ex) {
+                throw new ApplicationException("Could not invoke event \"" + identifier + "\" with argument of type " +
+                    args.GetType().Name + ". Expected " + typeof(TEvent).Name, ex);
+            }
+        }
+
+        /// <summary>
+        /// Triggered when and event occurs. Executes the event's action if the 
+        /// current state is at the top of the stack, otherwise triggers it on 
+        /// the next state down.
+        /// </summary>
+        /// <param name="name">Name of the event to trigger</param>
+        public void TriggerEvent(string name) {
+            TriggerEvent(name, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Triggered when and event occurs. Executes the event's action if the 
+        /// current state is at the top of the stack, otherwise triggers it on 
+        /// the next state down.
+        /// </summary>
+        /// <param name="name">Name of the event to trigger</param>
+        /// <param name="eventArgs">Arguments to send to the event</param>
+        public void TriggerEvent(string name, EventArgs eventArgs) {
+            
+            Action<EventArgs> myEvent;
+            if(events.TryGetValue(name, out myEvent)) {
+                myEvent(eventArgs);
+            }
+        }
+        #endregion
     }
 }
