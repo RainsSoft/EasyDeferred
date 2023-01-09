@@ -22,7 +22,7 @@ namespace EasyDeferred.Core
                 dispose(false);
             }
         }
-
+       
         #region IDisposable Implementation
 
         /// <summary>
@@ -55,6 +55,7 @@ namespace EasyDeferred.Core
         /// </remarks>
         /// <param name="disposeManagedResources">True if Unmanaged resources should be released.</param>
         protected virtual void dispose(bool disposeManagedResources) {
+            //释放非托管资源           
             if (!IsDisposed) {
                 if (disposeManagedResources) {
                     // Dispose managed resources.
@@ -67,8 +68,21 @@ namespace EasyDeferred.Core
                 // if we add them, they need to be released here.
             }
             IsDisposed = true;
+            //释放非托管资源 
+            if (disposeManagedResources) {
+                System.Threading.Interlocked.Exchange(ref _isDisposed, 1);
+                //GC.SuppressFinalize(this);
+            }
         }
-
+        private int _isDisposed;
+        /// <summary>
+        /// 检查对象是否已被显示释放了
+        /// </summary>
+        protected void CheckDisposed() {
+            if (_isDisposed == 1) {
+                throw new Exception(string.Format("The {0} object has be disposed.", this.GetType().Name));
+            }
+        }
 
         public void Dispose() {
             dispose(true);
@@ -77,4 +91,6 @@ namespace EasyDeferred.Core
 
         #endregion IDisposable Implementation
     };
+
+  
 }
