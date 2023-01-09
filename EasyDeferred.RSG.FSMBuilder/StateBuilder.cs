@@ -73,7 +73,7 @@ namespace EasyDeferred.RSG
     /// <summary>
     /// Builder providing a fluent API for constructing states.
     /// </summary>
-    public class StateBuilder<T, TParent> : IStateBuilder<T, TParent>
+    public sealed class StateBuilder<T, TParent> : IStateBuilder<T, TParent>
         where T : AbstractState, new() {
         /// <summary>
         /// Class to return when we call .End()

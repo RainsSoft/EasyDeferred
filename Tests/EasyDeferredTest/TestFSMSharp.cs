@@ -290,7 +290,8 @@ namespace EasyDeferredTest
             while (true) {
                 // 
                 fsm.Process((float)(DateTime.Now - baseTime).TotalSeconds);
-               
+                //or
+                //fsm.ProcessIncremental(1f);
                 System.Threading.Thread.Sleep(1000);
             }
         }

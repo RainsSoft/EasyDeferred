@@ -73,12 +73,22 @@ namespace EasyDeferred.FSMSharp
         /// <summary>
         /// Sets a callback which will be called everytime Process is called on the FSM, when this state is active
         /// </summary>
+        //[Obsolete("use Update")]
         public FsmStateBehaviour<T> Calls(Action<FsmStateData<T>> callback)
         {
+            return Update(callback);
+            //m_ProcessCallbacks.Add(callback);
+            //return this;
+        }
+        /// <summary>
+        /// Sets a callback which will be called everytime Process is called on the FSM, when this state is active
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <returns></returns>
+        public FsmStateBehaviour<T> Update(Action<FsmStateData<T>> callback) {
             m_ProcessCallbacks.Add(callback);
             return this;
         }
-
         /// <summary>
         /// Sets the state to automatically expire after the given time (in seconds)
         /// <paramref name="duration">时间进度总值</paramref>
@@ -135,10 +145,17 @@ namespace EasyDeferred.FSMSharp
         /// <summary>
         /// Calls the process callback
         /// </summary>
-        internal void Trigger(FsmStateData<T> data)
+        internal void TriggerUpdate(FsmStateData<T> data)
         {
-            for (int i = 0, len = m_ProcessCallbacks.Count; i < len; i++)
+            for(int i = 0, len = m_ProcessCallbacks.Count; i < len; i++) {
                 m_ProcessCallbacks[i](data);
+            }
+            // Update conditions
+            for(var i = 0; i < conditions.Count; i++) {
+                if(conditions[i].Predicate()) {
+                    conditions[i].Action();
+                }
+            }
         }
 
         /// <summary>
@@ -215,7 +232,8 @@ namespace EasyDeferred.FSMSharp
         }
 
         /// <summary>
-        /// Triggered when and event occurs. Executes the event's action if the 
+        /// 【非线程安全】触发当前状态中的指定名称的事件
+        /// [no thread safe] Triggered when and event occurs. Executes the event's action if the 
         /// current state is at the top of the stack, otherwise triggers it on 
         /// the next state down.
         /// </summary>
@@ -225,7 +243,8 @@ namespace EasyDeferred.FSMSharp
         }
 
         /// <summary>
-        /// Triggered when and event occurs. Executes the event's action if the 
+        /// 【非线程安全】触发当前状态中的指定名称的事件
+        /// [no thread safe] Triggered when and event occurs. Executes the event's action if the 
         /// current state is at the top of the stack, otherwise triggers it on 
         /// the next state down.
         /// </summary>
@@ -239,5 +258,27 @@ namespace EasyDeferred.FSMSharp
             }
         }
         #endregion
+
+        #region   Condition(条件执行)
+        /// <summary>
+        /// Data structure for associating a condition with an action.
+        /// </summary>
+        private struct Condition {
+            public Func<bool> Predicate;
+            public Action Action;
+        }
+        private readonly IList<Condition> conditions = new List<Condition>();
+        /// <summary>
+        /// Set an action to be called when the state is updated an a specified 
+        /// predicate is true.
+        /// </summary>
+        public void SetCondition(Func<bool> predicate, Action action) {
+            conditions.Add(new Condition() {
+                Predicate = predicate,
+                Action = action
+            });
+        }
+        #endregion
+
     }
 }
