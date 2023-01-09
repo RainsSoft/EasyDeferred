@@ -121,22 +121,22 @@ namespace EasyDeferred.FSMSharp
         {
             get { return m_StateBehaviours.Count; }
         }
-#if DEBUG
+
         /// <summary>
         /// Processes the logic for the FSM. 
         /// </summary>
-        /// <param name="time">The time, expressed in seconds.</param>
+        /// <param name="time">步进时间The time, expressed in seconds.</param>
         /// <exception cref="InvalidOperationException"></exception>
         public void ProcessIncremental(float dtime)
         {
             m_TimeBaseForIncremental += dtime;
             Process(m_TimeBaseForIncremental);
         }
-#endif
+
         /// <summary>
         /// Processes the logic for the FSM. 
         /// </summary>
-        /// <param name="time">The time, expressed in seconds.</param>
+        /// <param name="time">总时间The time, expressed in seconds.</param>
         /// <exception cref="InvalidOperationException"></exception>
         public void Process(float time)
         {
@@ -169,7 +169,7 @@ namespace EasyDeferred.FSMSharp
                 StateProgress = stateProgress
             };
 
-            m_CurrentStateBehaviour.Trigger(data);
+            m_CurrentStateBehaviour.TriggerUpdate(data);
 
             if (stateProgress >= 1f && m_CurrentStateBehaviour.NextStateSelector != null)
             {
@@ -252,7 +252,8 @@ namespace EasyDeferred.FSMSharp
 
         #region Trigger Event
         /// <summary>
-        /// Triggered when and event occurs. Executes the event's action if the 
+        /// 【非线程安全】 触发当前状态的中的指定事件名
+        ///[No thread safe] Triggered when and event occurs. Executes the event's action if the 
         /// current state is at the top of the stack, otherwise triggers it on 
         /// the next state down.
         /// </summary>
@@ -262,7 +263,8 @@ namespace EasyDeferred.FSMSharp
         }
 
         /// <summary>
-        /// Triggered when and event occurs. Executes the event's action if the 
+        /// 【非线程安全】 触发当前状态的中的指定事件名
+        /// [No thread safe] Triggered when and event occurs. Executes the event's action if the 
         /// current state is at the top of the stack, otherwise triggers it on 
         /// the next state down.
         /// </summary>
@@ -297,28 +299,28 @@ namespace EasyDeferred.FSMSharp
                 .GoesTo(Season.Spring)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.White)
                 .OnLeave((Z) => Console.WriteLine("Winter is ending..."))
-                .Calls(d => Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Spring)
                 .Expires(3f)
                 .GoesTo(Season.Summer)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Green)
                 .OnLeave((Z) => Console.WriteLine("Spring is ending..."))
-                .Calls(d => Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Summer)
                 .Expires(3f)
                 .GoesTo(Season.Fall)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Red)
                 .OnLeave((Z) => Console.WriteLine("Summer is ending..."))
-                .Calls(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Fall)
                 .Expires(3f)
                 .GoesTo(Season.Winter)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.DarkYellow)
                 .OnLeave((Z) => Console.WriteLine("Fall is ending..."))
-                .Calls(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f));
 
             // Very important! set the starting state
             fsm.CurrentState = Season.Winter;
@@ -444,7 +446,7 @@ namespace EasyDeferred.FSMSharp
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s1, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f);
                     d.State.DoUpdate();
                     System.Diagnostics.Debug.Assert(d.State==s1, "传入对象不一致");
@@ -463,7 +465,7 @@ namespace EasyDeferred.FSMSharp
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s2, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f);                    
                     System.Diagnostics.Debug.Assert(d.State == s2, "传入对象不一致");
                 });
@@ -481,7 +483,7 @@ namespace EasyDeferred.FSMSharp
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s3, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f);               
                     System.Diagnostics.Debug.Assert(d.State == s3, "传入对象不一致");
                 });
@@ -499,7 +501,7 @@ namespace EasyDeferred.FSMSharp
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s4, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f);                  
                     System.Diagnostics.Debug.Assert(d.State == s4, "传入对象不一致");
                 });

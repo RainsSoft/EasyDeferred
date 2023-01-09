@@ -33,28 +33,28 @@ namespace EasyDeferredTest
                 .GoesTo(Season.Spring)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.White)
                 .OnLeave((Z) => Console.WriteLine("Winter is ending..."))
-                .Calls(d => Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Spring)
                 .Expires(3f)
                 .GoesTo(Season.Summer)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Green)
                 .OnLeave((Z) => Console.WriteLine("Spring is ending..."))
-                .Calls(d => Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Summer)
                 .Expires(3f)
                 .GoesTo(Season.Fall)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Red)
                 .OnLeave((Z) => Console.WriteLine("Summer is ending..."))
-                .Calls(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f));
 
             fsm.Add(Season.Fall)
                 .Expires(3f)
                 .GoesTo(Season.Winter)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.DarkYellow)
                 .OnLeave((Z) => Console.WriteLine("Fall is ending..."))
-                .Calls(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f));
 
             // Very important! set the starting state
             fsm.CurrentState = Season.Winter;
@@ -192,7 +192,7 @@ namespace EasyDeferredTest
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s1, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f);
                     d.State.DoUpdate();
                     var v = d.Behaviour.CustomizeProgress;
@@ -217,7 +217,7 @@ namespace EasyDeferredTest
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s2, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f);
                     System.Diagnostics.Debug.Assert(d.State == s2, "传入对象不一致");
                 });
@@ -235,7 +235,7 @@ namespace EasyDeferredTest
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s3, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f);
                     System.Diagnostics.Debug.Assert(d.State == s3, "传入对象不一致");
                 });
@@ -253,13 +253,16 @@ namespace EasyDeferredTest
                     Z.DoLeave();
                     System.Diagnostics.Debug.Assert(Z == s4, "传入对象不一致");
                 })
-                .Calls(d => {
+                .Update(d => {
                     Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f);
                     System.Diagnostics.Debug.Assert(d.State == s4, "传入对象不一致");
                 })
                 .SetEvent("触发事件s4",(arg)=> {
                     Console.WriteLine("...触发事件s4");
-                });
+                }).SetCondition(()=> { return true; },()=> { 
+                     Console.WriteLine("...条件s4");
+                })
+                ;
 
             // Very important! set the starting state
             fsm.CurrentState = s1;

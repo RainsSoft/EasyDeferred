@@ -70,16 +70,15 @@ namespace EasyDeferred.FSMSharp
             return this;
         }
 
-        /// <summary>
-        /// Sets a callback which will be called everytime Process is called on the FSM, when this state is active
-        /// </summary>
-        //[Obsolete("use Update")]
-        public FsmStateBehaviour<T> Calls(Action<FsmStateData<T>> callback)
-        {
-            return Update(callback);
-            //m_ProcessCallbacks.Add(callback);
-            //return this;
-        }
+        ///// <summary>
+        ///// Sets a callback which will be called everytime Process is called on the FSM, when this state is active
+        ///// </summary>
+        ////[Obsolete("use Update")]
+        //public FsmStateBehaviour<T> Calls(Action<FsmStateData<T>> callback) {
+        //    //return Update(callback);
+        //    m_ProcessCallbacks.Add(callback);
+        //    return this;
+        //}
         /// <summary>
         /// Sets a callback which will be called everytime Process is called on the FSM, when this state is active
         /// </summary>
@@ -204,17 +203,18 @@ namespace EasyDeferred.FSMSharp
         /// Convenience method that uses default event args intended for events that 
         /// don't need any arguments.
         /// </summary>
-        public void SetEvent(string identifier, Action<EventArgs> eventTriggeredAction) {
-            SetEvent<EventArgs>(identifier, eventTriggeredAction);
+        public FsmStateBehaviour<T> SetEvent(string identifier, Action<EventArgs> eventTriggeredAction) {
+           return SetEvent<EventArgs>(identifier, eventTriggeredAction);
         }
 
         /// <summary>
         /// Sets an action to be associated with an identifier that can later be used
         /// to trigger it.
         /// </summary>
-        public void SetEvent<TEvent>(string identifier, Action<TEvent> eventTriggeredAction)
+        public FsmStateBehaviour<T> SetEvent<TEvent>(string identifier, Action<TEvent> eventTriggeredAction)
             where TEvent : EventArgs {
             events.Add(identifier, args => eventTriggeredAction(CheckEventArgs<TEvent>(identifier, args)));
+            return this;
         }
 
         /// <summary>
@@ -272,11 +272,12 @@ namespace EasyDeferred.FSMSharp
         /// Set an action to be called when the state is updated an a specified 
         /// predicate is true.
         /// </summary>
-        public void SetCondition(Func<bool> predicate, Action action) {
+        public FsmStateBehaviour<T> SetCondition(Func<bool> predicate, Action action) {
             conditions.Add(new Condition() {
                 Predicate = predicate,
                 Action = action
             });
+            return this;
         }
         #endregion
 
