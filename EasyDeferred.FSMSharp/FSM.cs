@@ -63,7 +63,7 @@ namespace EasyDeferred.FSMSharp
         /// <param name="name"></param>
         /// <returns></returns>
         public FsmStateBehaviour<T> Add(T state,string name) {
-            var behaviour = new FsmStateBehaviour<T>(state, name);
+            var behaviour = new FsmStateBehaviour<T>(state, name,this);
             if(this.AllowDuplicateName == false) {
                 if(checkExistName(name)) {
                     System.Diagnostics.Debug.Assert(false,"已经存在该名称State:"+name);
@@ -121,7 +121,7 @@ namespace EasyDeferred.FSMSharp
         {
             get { return m_StateBehaviours.Count; }
         }
-
+       
         /// <summary>
         /// Processes the logic for the FSM. 
         /// </summary>
@@ -140,13 +140,20 @@ namespace EasyDeferred.FSMSharp
         /// <exception cref="InvalidOperationException"></exception>
         public void Process(float time)
         {
-            if (m_StateAge < 0f)
+            if (m_StateAge < 0f) {
                 m_StateAge = time;
-
+                //m_NeedResetStateAge = true;
+            }
+            //if (m_NeedResetStateAge) {
+            //    m_NeedResetStateAge = false;
+            //    m_StateAge = time;
+            //}
             float totalTime = time;
             float stateTime = (totalTime - m_StateAge);
             float stateProgress = 0f;
-
+#if DEBUG
+            //Console.WriteLine("stateTime:"+stateTime);
+#endif
             if (m_CurrentStateBehaviour == null)
             {
                 throw new InvalidOperationException(string.Format("[FSM {0}] : Can't call 'Process' before setting the starting state.", m_FsmName));
@@ -158,6 +165,9 @@ namespace EasyDeferred.FSMSharp
             }
             if (m_CurrentStateBehaviour.IgnoreDurationAndEnableCustomProgress) {
                 stateProgress = m_CurrentStateBehaviour.CustomizeProgress;
+            }
+            if (m_CurrentStateBehaviour.NeedGoToStateImmediately) {
+                stateProgress = 1f;               
             }
             var data = new FsmStateData<T>()
             {
@@ -172,12 +182,15 @@ namespace EasyDeferred.FSMSharp
             m_CurrentStateBehaviour.TriggerUpdate(data);
 
             if (stateProgress >= 1f && m_CurrentStateBehaviour.NextStateSelector != null)
-            {
+            {               
+                
                 CurrentState = m_CurrentStateBehaviour.NextStateSelector();
-                m_StateAge = time;
+                //m_StateAge = time;
+                //m_NeedResetStateAge = true;
+                m_StateAge = -1f;
             }
         }
-
+        //private bool m_NeedResetStateAge = false;
         /// <summary>
         /// Gets or sets the current state of the FSM.
         /// </summary>

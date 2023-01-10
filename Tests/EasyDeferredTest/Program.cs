@@ -18,7 +18,7 @@ namespace EasyDeferredTest
 
             Console.ReadLine();
             //TestStateMachineBuilder.Test2();
-            //TestFSMSharp1.Test();
+            TestFSMSharp1.Test();
             TestFSMSharp2.Test();
         }
 

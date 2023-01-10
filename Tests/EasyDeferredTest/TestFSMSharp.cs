@@ -29,32 +29,56 @@ namespace EasyDeferredTest
             fsm2.Add(3).Expires(3f).GoesTo(1); ;
 
             fsm.Add(Season.Winter)
-                .Expires(3f)
+                .Expires(5f)
                 .GoesTo(Season.Spring)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.White)
                 .OnLeave((Z) => Console.WriteLine("Winter is ending..."))
-                .Update(d => Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f));
-
-            fsm.Add(Season.Spring)
-                .Expires(3f)
+                .Update(d => { 
+                    Console.WriteLine("Winter is going on.. {0}%", d.StateProgress * 100f);
+                    if (d.StateTime >= 1f) {
+                        d.Behaviour.GoToStateImmediately(Season.Spring);
+                    }
+                })
+                .End()
+                .Add(Season.Spring)
+                .Expires(5f,true)
                 .GoesTo(Season.Summer)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Green)
                 .OnLeave((Z) => Console.WriteLine("Spring is ending..."))
-                .Update(d => Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f));
-
-            fsm.Add(Season.Summer)
-                .Expires(3f)
+                .Update(d => { 
+                    Console.WriteLine("Spring is going on.. {0}%", d.StateProgress * 100f);
+                    if (d.StateTime >= 1f) {
+                        d.Behaviour.CustomizeProgress = 1f;
+                    }
+                })
+                .End()
+                .Add(Season.Summer)
+                .Expires(5f)
                 .GoesTo(Season.Fall)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.Red)
                 .OnLeave((Z) => Console.WriteLine("Summer is ending..."))
-                .Update(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f));
-
-            fsm.Add(Season.Fall)
-                .Expires(3f)
+                .Update(d => Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f))
+                .End()
+                .Add(Season.Fall)
+                .Expires(5f)
                 .GoesTo(Season.Winter)
                 .OnEnter((Z) => Console.ForegroundColor = ConsoleColor.DarkYellow)
                 .OnLeave((Z) => Console.WriteLine("Fall is ending..."))
-                .Update(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f));
+                .Update(d => Console.WriteLine("Fall is going on.. {0}%", d.StateProgress * 100f))
+                .SetEvent("test event", (z) => {
+                    Console.WriteLine("trigger event");
+                })
+                .SetCondition(() =>{
+                    for (int i = 0; i < 10; i++) {
+
+                    }
+                    return false;
+                    },
+                    ()=> {
+                        Console.WriteLine("condition");
+                    })
+                
+                ;
 
             // Very important! set the starting state
             fsm.CurrentState = Season.Winter;
@@ -73,7 +97,7 @@ namespace EasyDeferredTest
             while (true) {
                 // 
                 fsm.Process((float)(DateTime.Now - baseTime).TotalSeconds);
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(1000);
             }
         }
 
@@ -239,8 +263,8 @@ namespace EasyDeferredTest
                     Console.WriteLine("Summer is going on.. {0}%", d.StateProgress * 100f);
                     System.Diagnostics.Debug.Assert(d.State == s3, "传入对象不一致");
                 });
-
-            fsm.Add(s4)
+               
+             fsm.Add(s4)
                 .Expires(3f)
                 .GoesTo(s1)
                 .OnEnter((Z) => {

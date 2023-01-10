@@ -19,10 +19,11 @@ namespace EasyDeferred.FSMSharp
         /// Initializes a new instance of the <see cref="FsmStateBehaviour{T}"/> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        internal FsmStateBehaviour(T state,string name)
+        internal FsmStateBehaviour(T state,string name,FSM<T> parentBuilder)
         {
             State = state;
             this.Name = name;
+            this.parentBuilder = parentBuilder;
         }
         /// <summary>
         ///友好名 
@@ -34,7 +35,7 @@ namespace EasyDeferred.FSMSharp
         public T State { get; private set; }
 
         /// <summary>
-        /// Gets the time duration of the state (if any)
+        /// Gets the time duration of the state (if any) to Expires and can go to next state (if has)
         /// 控制时间进度,当进入状态时间>=Duration 时可切换State
         /// </summary>
         public float? Duration { get; private set; }
@@ -57,6 +58,7 @@ namespace EasyDeferred.FSMSharp
         public FsmStateBehaviour<T> OnEnter(Action<T> callback)
         {
             CustomizeProgress = 0f;
+            NeedGoToStateImmediately = false;
             m_EnterCallbacks.Add(callback);
             return this;
         }
@@ -102,7 +104,7 @@ namespace EasyDeferred.FSMSharp
 
         /// <summary>
         /// Sets the state to which the FSM goes when the duration of this expires, or when Next() gets called on the FSM
-        /// 指定下一个state(非立即进入),当进度>=1时，则自动进入到指定的State
+        /// 指定下一个state(非立即进入),当时间达到过期时间或自定义进度状态下进度>=1时，则自动进入到指定的State
         /// </summary>
         /// <param name="state">The state.</param>
         public FsmStateBehaviour<T> GoesTo(T state)
@@ -113,7 +115,7 @@ namespace EasyDeferred.FSMSharp
 
         /// <summary>
         /// Sets a function which selects the state to which the FSM goes when the duration of this expires, or when Next() gets called on the FSM
-        /// 指定下一个state(非立即进入),当进度>=1时，则自动进入到指定的State
+        /// 指定下一个state(非立即进入),当时间达到过期时间或自定义进度状态下进度>=1时，则自动进入到指定的State
         /// </summary>
         /// <param name="stateSelector">The state selector function.</param>
         public FsmStateBehaviour<T> GoesTo(Func<T> stateSelector)
@@ -121,26 +123,33 @@ namespace EasyDeferred.FSMSharp
             NextStateSelector = stateSelector;
             return this;
         }
+        #region GoToStateImmediately
         /// <summary>
-        /// 立即跳转到State
+        /// 标记立即完成进度进入下个状态
+        /// </summary>
+        internal bool NeedGoToStateImmediately {
+            get;
+            private set;
+        }
+        /// <summary>
+        /// 立即跳转到指定State
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public FsmStateBehaviour<T> GoToStateImmediately(T state) {
-            this.CustomizeProgress = 1f;
-            this.IgnoreDurationAndEnableCustomProgress = true;
+        public FsmStateBehaviour<T> GoToStateImmediately(T state) {           
+            this.NeedGoToStateImmediately = true;
             return GoesTo(state);
         }
         /// <summary>
-        /// 立即跳转到State
+        /// 立即跳转到指定State
         /// </summary>
         /// <param name="stateSelector"></param>
         /// <returns></returns>
-        public FsmStateBehaviour<T> GoToStateImmediately(Func<T> stateSelector) {
-            this.CustomizeProgress = 1f;
-            this.IgnoreDurationAndEnableCustomProgress = true;
+        public FsmStateBehaviour<T> GoToStateImmediately(Func<T> stateSelector) {            
+            this.NeedGoToStateImmediately = true;
             return GoesTo(stateSelector);
         }
+        #endregion
         /// <summary>
         /// Calls the process callback
         /// </summary>
@@ -281,5 +290,18 @@ namespace EasyDeferred.FSMSharp
         }
         #endregion
 
+        #region FSM
+        /// <summary>
+        /// Class to return when we call .End()
+        /// </summary>
+        private readonly FSM<T> parentBuilder;
+        /// <summary>
+        /// 返回创建当前对象FSM
+        /// </summary>
+        /// <returns></returns>
+        public FSM<T> End() {
+            return parentBuilder;
+        }
+        #endregion
     }
 }
