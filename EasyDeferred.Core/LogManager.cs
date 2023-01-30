@@ -46,7 +46,13 @@ namespace EasyDeferred.Core
     {
         #region Fields and Properties
         public LogManager() {
-            CreateLog("EDLog.txt",true,true);
+#if UNITY3D
+            //根据各个平台指定可读写的具体路径
+            CreateLog("", true, true);
+#else
+
+            CreateLog("EasyDeferred.log", true, true);
+#endif
         }
         /// <summary>
         ///     List of logs created by the log manager.
@@ -145,7 +151,7 @@ namespace EasyDeferred.Core
         /// <returns>Log with the specified name.</returns>
         public Log GetLog(string name) {
             if (logList[name] == null) {
-                throw new Exception(string.Format( "Log with the name '{0}' not found.", name));
+                throw new Exception(string.Format("Log with the name '{0}' not found.", name));
             }
 
             return (Log)logList[name];
