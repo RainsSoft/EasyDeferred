@@ -406,7 +406,8 @@ namespace EasyDeferred.DelayQueue
                 return 1;
             }
 
-            if (obj is DelayItem<T> value) {
+            if (obj is DelayItem<T> ) {
+                DelayItem<T> value = obj as DelayItem<T>;
                 return TimeoutMs.CompareTo(value.TimeoutMs);
             }
 
