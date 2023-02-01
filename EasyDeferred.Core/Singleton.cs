@@ -55,8 +55,10 @@ namespace EasyDeferred.Core
 		public static void Destroy() {
 			SingletonFactory.instance = null;
 		}
-
-		public static void Reinitialize() { }
+		///// <summary>
+		///// 
+		///// </summary>
+		//public static void Reinitialize() { }
 
 		#region IDisposable Implementation
 
