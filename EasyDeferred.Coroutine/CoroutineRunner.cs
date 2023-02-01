@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace EasyPromise.EasyDeferred.Coroutine
+namespace EasyDeferred.Coroutine
 {
     /// <summary>
     /// A container for running multiple routines in parallel. Coroutines can be nested.
+    /// https://github.com/ChevyRay/Coroutines/blob/master/Coroutines.cs
     /// </summary>
     public class CoroutineRunner
     {
@@ -89,13 +90,18 @@ namespace EasyPromise.EasyDeferred.Coroutine
         /// <returns>True if any routines were updated.</returns>
         /// <param name="deltaTime">How many seconds have passed sinced the last update.</param>
         public bool Update(float deltaTime) {
+#if DEBUG
+            //Console.WriteLine("CoroutineMgr fixedUpdate  thread id:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
+#endif
             if (running.Count > 0) {
                 for (int i = 0; i < running.Count; i++) {
                     if (delays.Count == 0 || i >= delays.Count) {
                         continue;
                     }
-                    if (delays[i] > 0f)
+                    if (delays[i] > 0f) {
+                        //延时等待第一次运行IEnumerator.MoveNext()
                         delays[i] -= deltaTime;
+                    }
                     else if (running[i] == null || !MoveNext(running[i], i)) {
                         running.RemoveAt(i);
                         delays.RemoveAt(i--);
@@ -116,8 +122,8 @@ namespace EasyPromise.EasyDeferred.Coroutine
 
             bool result = routine.MoveNext();
 
-            if (routine.Current is float)
-                delays[index] = (float)routine.Current;
+            //if (routine.Current is float)
+            //    delays[index] = (float)routine.Current;
 
             return result;
         }
@@ -181,87 +187,179 @@ namespace EasyPromise.EasyDeferred.Coroutine
         }
     }
 
-    class TestCoroutineRunner {  
-        int px = 0;
-        int py = 0;
-        void test() {
-            //Timer variables to run the update loop at 30 fps
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            const float updateRate = 1f / 30f;
-            float prevTime = watch.ElapsedMilliseconds / 1000f;
-            float accumulator = 0f;
+    //class TestCoroutineRunner
+    //{
+    //    int px = 0;
+    //    int py = 0;
+    //    void test() {
+    //        //Timer variables to run the update loop at 30 fps
+    //        var watch = System.Diagnostics.Stopwatch.StartNew();
+    //        const float updateRate = 1f / 30f;
+    //        float prevTime = watch.ElapsedMilliseconds / 1000f;
+    //        float accumulator = 0f;
 
-            //The little @ character's position
-          
-            //Run the coroutine
-            var runner = new CoroutineRunner();
-            var moving = runner.Run(Movement());
+    //        //The little @ character's position
 
-            //Run the update loop until we've finished moving
-            while (moving.IsRunning) {
-                //Track time
-                float currTime = watch.ElapsedMilliseconds / 1000f;
-                accumulator += currTime - prevTime;
-                prevTime = currTime;
+    //        //Run the coroutine
+    //        var runner = new CoroutineRunner();
+    //        var moving = runner.Run(Movement());
 
-                //Update at our requested rate (30 fps)
-                if (accumulator > updateRate) {
-                    accumulator -= updateRate;
-                    runner.Update(updateRate);
-                    DrawMap();
-                }
-            }
-        }  
-        //Routine to move horizontally
-            IEnumerator MoveX(int amount, float stepTime) {
-                int dir = amount > 0 ? 1 : -1;
-                while (amount != 0) {
-                    yield return stepTime;
-                    px += dir;
-                    amount -= dir;
-                }
-            }
+    //        //Run the update loop until we've finished moving
+    //        while (moving.IsRunning) {
+    //            //Track time
+    //            float currTime = watch.ElapsedMilliseconds / 1000f;
+    //            accumulator += currTime - prevTime;
+    //            prevTime = currTime;
 
-            //Routine to move vertically
-            IEnumerator MoveY( int amount, float stepTime) {
-                int dir = amount > 0 ? 1 : -1;
-                while (amount != 0) {
-                    yield return stepTime;
-                    py += dir;
-                    amount -= dir;
-                }
-            }
+    //            //Update at our requested rate (30 fps)
+    //            if (accumulator > updateRate) {
+    //                accumulator -= updateRate;
+    //                runner.Update(updateRate);
+    //                DrawMap();
+    //            }
+    //        }
+    //    }
+    //    class WaitSeconds : IEnumerator
+    //    {
+    //        public WaitSeconds(float seconds) {
+    //            this.Seconds = seconds;
+    //            this.m_Milliseconds = Convert.ToInt32(seconds * 1000f);
+    //        }
+    //        public object Current { get { return m_Current; } }
+    //        private object m_Current;
+    //        private System.Diagnostics.Stopwatch m_Start = new System.Diagnostics.Stopwatch();
+    //        private bool m_first;
+    //        private int m_Milliseconds;
+    //        public float Seconds {
+    //            get;
+    //            private set;
+    //        }
+    //        public bool MoveNext() {
+    //            if (!m_first) {
+    //                m_first = true;
+    //                m_Start.Start();
+    //            }
+    //            if (m_Start.ElapsedMilliseconds > m_Milliseconds) {
+    //                m_Current = false;
+    //                return false;
+    //            }
+    //            m_Current = true;
+    //            return true;
+    //        }
 
-            //Walk the little @ character on a path
-            IEnumerator Movement() {
-                //Walk normally
-                yield return MoveX(5, 0.25f);
-                yield return MoveY(5, 0.25f);
+    //        public void Reset() {
+    //            m_Start.Reset();
+    //        }
+    //    }
+    //    //Routine to move horizontally
+    //    IEnumerator MoveX(int amount, float stepTime) {
+    //        int dir = amount > 0 ? 1 : -1;
+    //        while (amount != 0) {
+    //            yield return new WaitSeconds(stepTime);
+    //            px += dir;
+    //            amount -= dir;
+    //        }
+    //    }
 
-                //Walk slowly
-                yield return MoveX(2, 0.5f);
-                yield return MoveY(2, 0.5f);
-                yield return MoveX(-2, 0.5f);
-                yield return MoveY(-2, 0.5f);
+    //    //Routine to move vertically
+    //    IEnumerator MoveY(int amount, float stepTime) {
+    //        int dir = amount > 0 ? 1 : -1;
+    //        while (amount != 0) {
+    //            yield return new WaitSeconds(stepTime);
+    //            py += dir;
+    //            amount -= dir;
+    //        }
+    //    }
 
-                //Run fast
-                yield return MoveX(5, 0.1f);
-                yield return MoveY(5, 0.1f);
-            }
+    //    //Walk the little @ character on a path
+    //    IEnumerator Movement() {
+    //        //Walk normally
+    //        yield return MoveX(5, 0.25f);
+    //        yield return MoveY(5, 0.25f);
 
-            //Render a little map with the @ character in the console
-            void DrawMap() {
-                Console.Clear();
-                for (int y = 0; y < 16; ++y) {
-                    for (int x = 0; x < 16; ++x) {
-                        if (x == px && y == py)
-                            Console.Write('@');
-                        else
-                            Console.Write('.');
-                    }
-                    Console.WriteLine();
-                }
-            }
-    
+    //        //Walk slowly
+    //        yield return MoveX(2, 0.5f);
+    //        yield return MoveY(2, 0.5f);
+    //        yield return MoveX(-2, 0.5f);
+    //        yield return MoveY(-2, 0.5f);
+
+    //        //Run fast
+    //        yield return MoveX(5, 0.1f);
+    //        yield return MoveY(5, 0.1f);
+    //    }
+
+    //    //Render a little map with the @ character in the console
+    //    void DrawMap() {
+    //        Console.Clear();
+    //        for (int y = 0; y < 16; ++y) {
+    //            for (int x = 0; x < 16; ++x) {
+    //                if (x == px && y == py)
+    //                    Console.Write('@');
+    //                else
+    //                    Console.Write('.');
+    //            }
+    //            Console.WriteLine();
+    //        }
+    //    }
+
+    //}
+
+
+    /*
+     IEnumerator GatherNPCs(Vector gatheringPoint)
+{
+    //Make three NPCs walk to the gathering point at the same time
+    var move1 = runner.Run(npc1.WalkTo(gatheringPoint));
+    var move2 = runner.Run(npc2.WalkTo(gatheringPoint));
+    var move3 = runner.Run(npc3.WalkTo(gatheringPoint));
+
+    //We don't know how long they'll take, so just wait until all three have finished
+    while (move1.IsPlaying || move2.IsPlaying || move3.IsPlaying)
+        yield return null;
+
+    //Now they've all gathered!
+}
+
+    IEnumerator DownloadFile(string url, string toFile)
+{
+    //I actually don't know how to download files in C# so I just guessed this, but you get the point
+    bool done = false;
+    var client = new WebClient();
+    client.DownloadFileCompleted += (e, b, o) => done = true;
+    client.DownloadFileAsync(new Uri(url), toFile);
+    while (!done)
+        yield return null;
+}
+
+//Download the files one-by-one in sync
+IEnumerator DownloadOneAtATime()
+{
+    yield return DownloadFile("http://site.com/file1.png", "file1.png");
+    yield return DownloadFile("http://site.com/file2.png", "file2.png");
+    yield return DownloadFile("http://site.com/file3.png", "file3.png");
+    yield return DownloadFile("http://site.com/file4.png", "file4.png");
+    yield return DownloadFile("http://site.com/file5.png", "file5.png");
+}
+
+//Download the files all at once asynchronously
+IEnumerator DownloadAllAtOnce()
+{
+    //Start multiple async downloads and store their handles
+    var downloads = new List<CoroutineHandle>();
+    downloads.Add(runner.Run(DownloadFile("http://site.com/file1.png", "file1.png")));
+    downloads.Add(runner.Run(DownloadFile("http://site.com/file2.png", "file2.png")));
+    downloads.Add(runner.Run(DownloadFile("http://site.com/file3.png", "file3.png")));
+    downloads.Add(runner.Run(DownloadFile("http://site.com/file4.png", "file4.png")));
+    downloads.Add(runner.Run(DownloadFile("http://site.com/file5.png", "file5.png")));
+
+    //Wait until all downloads are done
+    while (downloads.Count > 0)
+    {
+        yield return null;
+        for (int i = 0; i < downloads.Count; ++i)
+            if (!downloads[i].IsRunning)
+                downloads.RemoveAt(i--);
     }
+}
+     */
 }
