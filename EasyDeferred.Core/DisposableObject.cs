@@ -22,13 +22,13 @@ namespace EasyDeferred.Core
                 dispose(false);
             }
         }
-       
+
         #region IDisposable Implementation
 
         /// <summary>
         /// Determines if this instance has been disposed of already.
         /// </summary>       
-        public bool IsDisposed { get;private set; }
+        public bool IsDisposed { get; private set; }
 
         /// <summary>
         /// Class level dispose method
@@ -69,17 +69,19 @@ namespace EasyDeferred.Core
             }
             IsDisposed = true;
             //释放非托管资源 
-            if (disposeManagedResources) {
-                System.Threading.Interlocked.Exchange(ref _isDisposed, 1);
-                //GC.SuppressFinalize(this);
-            }
+            //if (disposeManagedResources) {
+            //增加计数
+            CheckDisposed();
+            System.Threading.Interlocked.Exchange(ref _isDisposed, 1);
+            //GC.SuppressFinalize(this);
+            //}
         }
         private int _isDisposed;
         /// <summary>
         /// 检查对象是否已被显示释放了
         /// </summary>
         protected void CheckDisposed() {
-            if (_isDisposed == 1) {
+            if (_isDisposed > 0) {
                 throw new Exception(string.Format("The {0} object has be disposed.", this.GetType().Name));
             }
         }
@@ -92,5 +94,5 @@ namespace EasyDeferred.Core
         #endregion IDisposable Implementation
     };
 
-  
+
 }

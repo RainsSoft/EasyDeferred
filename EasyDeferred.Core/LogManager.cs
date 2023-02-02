@@ -46,13 +46,13 @@ namespace EasyDeferred.Core
     {
         #region Fields and Properties
         public LogManager() {
-#if UNITY3D
-            //根据各个平台指定可读写的具体路径
-            CreateLog("", true, true);
-#else
+//#if UNITY3D
+//            //根据各个平台指定可读写的具体路径
+//            CreateLog("", true, true);
+//#else
 
-            CreateLog("EasyDeferred.log", true, true);
-#endif
+           CreateLog("", true, true);
+//#endif
         }
         /// <summary>
         ///     List of logs created by the log manager.

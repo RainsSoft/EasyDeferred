@@ -117,7 +117,7 @@ namespace EasyDeferred.Core
             this.debugOutput = debugOutput;
             logLevel = LoggingLevel.Normal;
 
-            if (fileName != null) {
+            if (!string.IsNullOrEmpty(fileName)) {
                 try {
                     // create the log file, or open
                     log = File.Open(fileName, FileMode.Create, FileAccess.Write, FileShare.Read);
