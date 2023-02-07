@@ -11,7 +11,8 @@ namespace EasyDeferred
     /// </summary>
     public delegate IEnumerator DeferredCoroutine(PromiseCoroutine deferred);
     /// <summary>
-    /// wrapper IEnumerator auto execute promise
+    /// wrapper IEnumerator auto execute promise,
+    /// Interceptable Coroutine, Internal catch exception
     /// </summary>
     public class PromiseCoroutine
     {
